@@ -2,56 +2,39 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE NEXUS | SOVEREIGN CORE</title>
-<!-- טעינת עיצוב Tailwind ואייקונים -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TERMINAL // THE NEXUS // SOVEREIGN CORE</title>
 <script src="https://tailwindcss.com"></script>
 <script src="https://unpkg.com"></script>
-<!-- חיבור הסטייל שלך -->
-<link rel="stylesheet" href="app.css">
-
+<link rel="stylesheet" href="style.css">
 <style>
-/* רקע המטריקס */
-#matrix-canvas {
-position: fixed;
-top: 0;
-left: 0;
-z-index: 0;
-opacity: 0.15;
-}
-/* שכבת ה-React מעל המטריקס */
-#root {
-position: relative;
-z-index: 10;
-}
+#matrix-canvas { position: fixed; top: 0; left: 0; z-index: 0; opacity: 0.15; pointer-events: none; }
+#root { position: relative; z-index: 10; }
+.boot-screen { position: fixed; inset: 0; background: black; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: monospace; color: #00ff41; }
 </style>
 </head>
-<body class="bg-black m-0 p-0 overflow-hidden">
-
+<body class="bg-black overflow-hidden m-0 p-0">
+<div id="boot-loader" class="boot-screen">
+<div id="boot-text" class="text-[10px] uppercase tracking-widest mb-4"></div>
+<div class="w-48 h-1 bg-green-900 overflow-hidden"><div id="boot-bar" class="h-full bg-green-500 w-0 transition-all duration-300"></div></div>
+</div>
 <canvas id="matrix-canvas"></canvas>
 <div id="root"></div>
 
-<!-- ספריות הליבה להפעלת הקוד -->
 <script src="https://unpkg.com"></script>
 <script src="https://unpkg.com"></script>
 <script src="https://unpkg.com"></script>
 
-<!-- סקריפט המטריקס (האנימציה שאתה רואה) -->
 <script>
 const canvas = document.getElementById('matrix-canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@&*";
-const fontSize = 14;
-const columns = canvas.width / fontSize;
+const fontSize = 14; const columns = canvas.width / fontSize;
 const drops = Array(Math.floor(columns)).fill(1);
-
 function draw() {
-ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-ctx.fillStyle = "#0f0";
-ctx.font = fontSize + "px monospace";
+ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
 for (let i = 0; i < drops.length; i++) {
 const text = letters.charAt(Math.floor(Math.random() * letters.length));
 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
@@ -60,18 +43,21 @@ drops[i]++;
 }
 }
 setInterval(draw, 33);
-// טעינת אייקונים
+
+const logs = ["> INJECTING CORE...", "> BYPASSING FIREWALL...", "> LINKING NEURAL_NET...", "> ACCESS GRANTED."];
+let lIdx = 0;
+function boot() {
+if (lIdx < logs.length) {
+document.getElementById('boot-text').innerText = logs[lIdx];
+document.getElementById('boot-bar').style.width = (lIdx + 1) * 25 + "%";
+lIdx++; setTimeout(boot, 600);
+} else {
+setTimeout(() => document.getElementById('boot-loader').style.display = 'none', 500);
+}
+}
+boot();
 lucide.createIcons();
 </script>
-
-<!-- הפעלת קובץ ה-app.js שלך -->
-<script type="text/babel" src="app.js"></script>
-
-<script type="text/babel">
-// פקודת ההרצה שמחברת בין האינדקס לקוד ב-app.js
-const root = ReactDOM.createRoot(document.getElementById('root'));
-// וודא שבקובץ app.js הפונקציה האחרונה נקראת App
-root.render(<App />);
-</script>
+<script type="text/babel" src="script.js"></script>
 </body>
 </html>
