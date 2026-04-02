@@ -6,11 +6,11 @@ body {
 }
 
 button {
+  padding: 10px;
+  margin: 5px;
   background: #21262d;
   color: white;
   border: none;
-  padding: 10px;
-  margin: 5px;
   cursor: pointer;
 }
 
@@ -24,14 +24,19 @@ button:hover {
 
 .section {
   margin-top: 20px;
-  padding: 10px;
   border: 1px solid #30363d;
+  padding: 10px;
 }
 
 #emergencyBanner {
   background: red;
-  color: white;
   display: none;
   padding: 15px;
   font-size: 20px;
+}
+
+.chatBox {
+  height: 150px;
+  overflow-y: auto;
+  border: 1px solid #444;
 }
