@@ -402,3 +402,221 @@ addNotify("פרוטוקול הועתק: מוכן להפצה");
 <div className="max-w-5xl mx-auto space-y-12 animate-in zoom-in-95 duration-500">
 {!user.bankActive ? (
 <div className
+/* המשך דף בנק (BANK CONTINUED) */
+<div className="grid grid-cols-12 gap-8">
+<div className="col-span-5 shadow-card p-8 border-yellow-600/20 bg-yellow-600/5 relative overflow-hidden">
+<div className="absolute top-0 right-0 p-4 opacity-5"><Landmark size={80} /></div>
+<h3 className="text-xl font-black mb-6 text-yellow-600 italic flex items-center gap-3">
+<Zap size={24} /> הלוואת חירום (Loan)
+</h3>
+<p className="text-[10px] text-gray-500 mb-8 leading-relaxed uppercase">
+קבלת הזרקה מיידית של 1000 NC. זמן סנכרון בנקאי: 60 שניות.
+</p>
+{loanTimer > 0 ? (
+<div className="text-center space-y-4">
+<div className="h-1.5 w-full bg-gray-900 overflow-hidden">
+<div className="h-full bg-yellow-600 transition-all duration-1000" style={{ width: `${(loanTimer/60)*100}%` }}></div>
+</div>
+<div className="font-mono text-4xl text-white tracking-widest animate-pulse">00:{loanTimer < 10 ? `0${loanTimer}` : loanTimer}</div>
+</div>
+) : (
+<button onClick={() => setLoanTimer(60)} className="w-full py-5 border-2 border-yellow-600 text-yellow-600 font-black uppercase text-xs hover:bg-yellow-600 hover:text-black transition-all active:scale-95">
+בקש הזרקה של 1000 NC
+</button>
+)}
+</div>
+
+<div className="col-span-7 shadow-card p-8 bg-zinc-950/40 relative">
+<h3 className="text-xl font-black text-green-500 italic mb-6 flex items-center gap-3">
+<TrendingUp size={24} /> זירת השקעות (Investments)
+</h3>
+<div className="space-y-4">
+{[
+{ n: 'מסלול מהיר', r: 'High', y: '25%', t: '2 דקות' },
+{ n: 'מסלול יציב', r: 'Mid', y: '10%', t: '5 דקות' },
+{ n: 'מסלול בטוח', r: 'Low', y: '3%', t: '10 דקות' }
+].map((plan, i) => (
+<div key={i} className="flex justify-between items-center p-4 border border-white/5 bg-white/5 hover:border-green-500/30 transition-all group">
+<div>
+<div className="text-sm font-bold text-white uppercase group-hover:text-green-500 transition-colors">{plan.n}</div>
+<div className="text-[9px] text-gray-500 uppercase mt-1 font-mono">סיכון: {plan.r} | זמן: {plan.t}</div>
+</div>
+<div className="flex items-center gap-6">
+<span className="text-xs font-black text-green-500 font-mono">+{plan.y}</span>
+<button
+disabled={user.balance < 500}
+onClick={() => { setUser(u => ({ ...u, balance: u.balance - 500 })); addLog(`השקעה הופעלה: ${plan.n}`); }}
+className="px-6 py-2 border border-gray-700 text-[9px] font-black uppercase hover:border-green-500 hover:text-green-500 disabled:opacity-30 transition-all"
+>
+השקע 500
+</button>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+)}
+</div>
+)}
+
+{/* PAGE: WAR ROOM (Operation & Voting) */}
+{activeTab === 'WarRoom' && (
+<div className="max-w-5xl mx-auto space-y-12 animate-in slide-in-from-bottom-8 duration-700">
+<div className="shadow-card p-10 border-red-500/30 bg-red-500/5 relative overflow-hidden">
+<div className="absolute top-0 right-0 p-4 opacity-10"><Sword size={80} className="text-red-500" /></div>
+<h2 className="text-3xl font-black text-red-500 uppercase italic mb-8 tracking-tighter">שידור הצעת מבצע / תקיפה תודעתית</h2>
+<div className="flex gap-4">
+<input id="opInput" placeholder="הזן שם קוד למבצע או הצעת חוק חדשה..." className="flex-1 bg-black border border-white/10 p-5 text-sm font-mono text-red-500 focus:border-red-500 outline-none transition-all uppercase" />
+<button onClick={() => {
+const v = document.getElementById('opInput').value;
+if(v){
+setProposals([{ id: Date.now(), title: v, votes: 0, status: 'Active', proposer: user.codename }, ...proposals]);
+document.getElementById('opInput').value='';
+addLog("הצעה חדשה שודרה לחדר המלחמה.");
+}
+}} className="px-12 bg-red-600 text-white font-black uppercase text-xs hover:bg-red-500 shadow-xl shadow-red-900/30">שדר הצעה</button>
+</div>
+</div>
+
+<div className="grid grid-cols-2 gap-8">
+{proposals.map(p => (
+<div key={p.id} className="shadow-card p-8 border-gray-800 bg-zinc-950/40 relative group">
+<div className="flex justify-between items-center mb-6">
+<div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">מציע: {p.proposer}</div>
+<div className="px-3 py-1 bg-red-600/20 text-red-500 text-[9px] font-black uppercase animate-pulse border border-red-500/30">סטטוס: {p.status}</div>
+</div>
+<h3 className="text-white text-xl font-black italic mb-8 uppercase tracking-tight group-hover:text-red-500 transition-colors">"{p.title}"</h3>
+<div className="grid grid-cols-2 gap-4">
+<button onClick={() => setProposals(prev => prev.map(x => x.id === p.id ? {...x, votes: x.votes + 1} : x))} className="py-4 border border-green-500 text-green-500 font-black text-[11px] uppercase hover:bg-green-500 hover:text-black transition-all">
+בעד ({p.votes})
+</button>
+<button className="py-4 border border-red-500 text-red-500 font-black text-[11px] uppercase opacity-20 cursor-not-allowed">נגד</button>
+</div>
+</div>
+))}
+{proposals.length === 0 && <div className="col-span-2 text-center py-20 border border-dashed border-white/5 opacity-20 italic uppercase tracking-widest text-sm">חדר המלחמה שקט. ממתין לפקודות גנרל.</div>}
+</div>
+</div>
+)}
+
+{/* PAGE: PROTOCOLS (Distribution Library) */}
+{activeTab === 'Protocols' && (
+<div className="max-w-4xl mx-auto space-y-10 animate-in slide-in-from-right-8 duration-700">
+<h2 className="text-2xl font-black uppercase italic border-b border-white/10 pb-6 flex items-center gap-4"><Scroll /> ספריית פרוטוקולים להפצה</h2>
+<div className="grid gap-8">
+{PROTOCOLS_DB.map(p => (
+<div key={p.id} className="shadow-card p-8 border-white/10 bg-white/5 relative group">
+<div className="absolute top-0 right-0 p-4 text-[10px] text-gray-700 font-mono uppercase font-black">{p.id}</div>
+<h3 className="text-xl font-black text-white italic mb-4 uppercase">{p.title}</h3>
+<div className="bg-black p-6 border border-white/5 text-xs text-gray-400 font-mono leading-relaxed mb-6 select-all">
+{p.content}
+</div>
+<button onClick={() => { navigator.clipboard.writeText(p.content); addLog(`פרוטוקול ${p.id} הועתק.`); }} className="px-8 py-3 border border-green-500 text-green-500 text-[11px] font-black uppercase hover:bg-green-500 hover:text-black transition-all">
+העתק טקסט להפצה (Copy)
+</button>
+</div>
+))}
+</div>
+</div>
+)}
+
+{/* PAGE: CHAT (Shadow Net) */}
+{activeTab === 'Chat' && (
+<div className="max-w-4xl mx-auto h-[65vh] flex flex-col shadow-card border-green-500/20 bg-zinc-950/80 animate-in fade-in">
+<div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/50">
+<div className="text-[10px] font-black uppercase tracking-widest text-green-500 flex items-center gap-3">
+<Radio size={14} className="animate-pulse" /> ערוץ מוצפן: SHADOW_NET_v6
+</div>
+<span className="text-[8px] text-gray-600 uppercase">End-to-End Encrypted</span>
+</div>
+<div className="flex-1 p-6 overflow-y-auto space-y-4 font-mono text-[11px] custom-scrollbar">
+{chat.map(m => (
+<div key={m.id} className="flex flex-col gap-1">
+<div className="flex items-center gap-2">
+<span className="text-gray-600 font-bold">[{m.s}]</span>
+<span className="text-[8px] text-gray-800 font-normal">[{new Date().toLocaleTimeString()}]</span>
+</div>
+<span className="text-green-400 border-l border-green-900/30 pl-3 py-1">{m.m}</span>
+</div>
+))}
+</div>
+<div className="p-6 border-t border-white/10 flex gap-4 bg-black/20">
+<input id="chatIn" placeholder="הקלד הודעה מוצפנת..." className="flex-1 bg-black border border-white/10 p-4 text-xs outline-none text-green-500 focus:border-green-500" />
+<button onClick={() => { const v = document.getElementById('chatIn').value; if(v){ setChat([...chat, { id: Date.now(), s: user.codename, m: v }]); document.getElementById('chatIn').value=''; } }} className="bg-green-600 text-black px-10 font-black uppercase text-xs hover:bg-green-500 transition-all">שלח</button>
+</div>
+</div>
+)}
+
+{/* PAGE: PROFILE (Biometric Dossier) */}
+{activeTab === 'Profile' && (
+<div className="max-w-5xl mx-auto grid grid-cols-12 gap-8 animate-in zoom-in-95 duration-500">
+<div className="col-span-4 shadow-card p-10 flex flex-col items-center border-green-500/20 bg-green-500/5">
+<div className="w-40 h-40 border-2 border-green-500 p-1 mb-8 relative">
+<div className="absolute inset-0 border border-green-500 animate-ping opacity-10"></div>
+<img src={`https://dicebear.com{user.codename}`} alt="Avatar" className="w-full h-full bg-black grayscale" />
+</div>
+<h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-2">{user.codename}</h3>
+<div className="px-4 py-1 bg-green-500 text-black text-[10px] font-black uppercase mb-10 tracking-widest">{user.rank}</div>
+<div className="w-full space-y-6">
+<div className="flex justify-between text-[10px] uppercase border-b border-white/5 pb-2"><span className="text-gray-500 font-bold">אמינות (Trust):</span><span className="text-green-500">100%</span></div>
+<div className="flex justify-between text-[10px] uppercase border-b border-white/5 pb-2"><span className="text-gray-500 font-bold">משימות (Ops):</span><span className="text-white">{user.stats.missions}</span></div>
+<div className="flex justify-between text-[10px] uppercase border-b border-white/5 pb-2"><span className="text-gray-500 font-bold">השפעה (Viral):</span><span className="text-blue-500">{user.stats.influence}%</span></div>
+</div>
+</div>
+<div className="col-span-8 shadow-card p-10 bg-zinc-950/40 border-white/5 relative overflow-hidden">
+<div className="absolute -right-20 -bottom-20 opacity-5 rotate-12"><Activity size={300} /></div>
+<h3 className="text-xl font-black mb-10 border-b border-white/10 pb-4 flex items-center gap-3 uppercase tracking-widest"><Activity size={20} className="text-green-500" /> ניטור פעילות ביומטרי (Dossier)</h3>
+<div className="grid grid-cols-7 gap-2 h-48 mb-10">
+{Array.from({length: 28}).map((_, i) => (
+<div key={i} className={`border border-white/5 ${Math.random() > 0.4 ? 'bg-green-500/40 shadow-[0_0_10px_rgba(0,255,65,0.2)]' : 'bg-transparent'}`}></div>
+))}
+</div>
+<div className="grid grid-cols-3 gap-8">
+<div className="text-center p-6 border border-white/5 bg-black/40">
+<div className="text-3xl font-black text-white italic">124</div>
+<div className="text-[9px] text-gray-500 uppercase mt-2 font-bold">שעות פעולה</div>
+</div>
+<div className="text-center p-6 border border-white/5 bg-black/40">
+<div className="text-3xl font-black text-white italic">8.4K</div>
+<div className="text-[9px] text-gray-500 uppercase mt-2 font-bold">חשיפות נרטיב</div>
+</div>
+<div className="text-center p-6 border border-white/5 bg-black/40">
+<div className="text-3xl font-black text-white italic">0</div>
+<div className="text-[9px] text-gray-500 uppercase mt-2 font-bold">הדלפות זהות</div>
+</div>
+</div>
+</div>
+</div>
+)}
+</main>
+</div>
+
+{/* TERMINAL FOOTER */}
+<footer className="h-10 border-t border-white/5 bg-black px-8 flex items-center justify-between text-[9px] text-gray-700 uppercase font-mono tracking-widest shrink-0">
+<div className="flex gap-10 items-center">
+<span className="flex items-center gap-2"><div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div> SYSTEM: ONLINE</span>
+<span className="hidden md:inline">LATENCY: 22MS</span>
+<span className="hidden md:inline">NODE_HQ: ISR_CENTRAL</span>
+</div>
+<div>NEXUS_OS // SINGULARITY v6.0.4 &copy; 2026 // OUT OF THE MATRIX</div>
+</footer>
+</div>
+);
+};
+
+// --- האפליקציה המאוחדת הסופית ---
+const App = () => {
+const [session, setSession] = useState(null);
+const [booting, setBooting] = useState(true);
+
+useEffect(() => {
+const timer = setTimeout(() => setBooting(false), 2000);
+return () => clearTimeout(timer);
+}, []);
+
+if (booting) return <LoadingShader msg="מאתחל פרוטוקול Nexus..." onDone={() => {}} />;
+if (!session) return <AccessPortal onLogin={(data) => setSession(data)} />;
+
+return <NexusOS agentData={session} />;
+};
