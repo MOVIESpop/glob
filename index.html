@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="bg-black overflow-hidden">
+<head>
+<meta charset="UTF-8" />
+<!-- פקודות אבטחה למניעת שמירת מטמון וניטור (OpSec) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+<title>TERMINAL // THE NEXUS // SINGULARITY</title>
+
+<!-- טעינת ספריות ליבה (CDN) -->
+<script src="https://tailwindcss.com"></script>
+<script src="https://unpkg.com"></script>
+<link rel="stylesheet" href="app.css">
+
+<style>
+/* אפקט מטריקס רץ ברקע האינדקס */
+#matrix-bg {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 0;
+opacity: 0.15;
+pointer-events: none;
+}
+
+/* סמן פעימה ביומטרי */
+.heartbeat-dot {
+width: 8px;
+height: 8px;
+background: #00ff41;
+border-radius: 50%;
+box-shadow: 0 0 10px #00ff41;
+animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+0% { transform: scale(1); opacity: 1; }
+50% { transform: scale(1.5); opacity: 0.5; }
+100% { transform: scale(1); opacity: 1; }
+}
+
+/* אפקט טעינה של מסך CRT ישן */
+.crt-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+background-size: 100% 2px, 3px 100%;
+pointer-events: none;
+z-index: 100;
+}
+</style>
+</head>
+
+<body class="m-0 p-0 font-mono antialiased">
+<!-- שכבת CRT ושכבת מטריקס -->
+<div class="crt-overlay"></div>
+<canvas id="matrix-bg"></canvas>
+
+<!-- ממשק טעינה ראשוני (Pre-loader) -->
+<div id="boot-sequence" class="fixed inset-0 z-50 bg-black flex flex-col p-10 text-green-500 overflow-hidden">
+<div id="boot-log" class="text-[10px] leading-tight uppercase mb-4"></div>
+<div class="mt-auto flex items-center gap-3 border-t border-green-900 pt-4">
+<div class="heartbeat-dot"></div>
+<span class="text-[9px] tracking-[0.4em] uppercase">Initialising Neural Link...</span>
+</div>
+</div>
+
+<!-- הדיב המרכזי של React -->
+<div id="root" class="relative z-10"></div>
+
+<!-- ספריות React ו-Babel -->
+<script src="https://unpkg.com"></script>
+<script src="https://unpkg.com"></script>
+<script src="https://unpkg.com"></script>
+
+<!-- סקריפט ניהול אינדקס (Matrix + Boot Logic) -->
+<script>
+// 1. אפקט מטריקס (Canvas)
+const canvas = document.getElementById('matrix-bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@&*";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = "#0f0";
+ctx.font = fontSize + "px monospace";
+for (let i = 0; i < drops.length; i++) {
+const text = letters.charAt(Math.floor(Math.random() * letters.length));
+ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+drops[i]++;
+}
+}
+setInterval(drawMatrix, 33);
+
+// 2. לוג טעינה (Boot Sequence)
+const logs = [
+"> CONNECTING TO HQ_ISR_NODE...",
+"> BYPASSING GOVERNMENT FIREWALLS...",
+"> DECRYPTING SOVEREIGN_PROTOCOLS...",
+"> ACCESSING SHADOW_ASSETS...",
+"> INJECTING NEXUS_CORE_V4...",
+"> NEURAL LINK ESTABLISHED."
+];
+let logIndex = 0;
+const logContainer = document.getElementById('boot-log');
+
+function typeLog() {
+if (logIndex < logs.length) {
+const p = document.createElement('p');
+p.textContent = logs[logIndex];
+logContainer.appendChild(p);
+logIndex++;
+setTimeout(typeLog, 400);
+} else {
+setTimeout(() => {
+document.getElementById('boot-sequence').style.display = 'none';
+}, 1000);
+}
+}
+typeLog();
+
+// אתחול אייקונים
+lucide.createIcons();
+</script>
+
+<!-- חיבור ה-app.js שלך -->
+<script type="text/babel" src="app.js"></script>
+
+<script type="text/babel">
+// פקודת ההרצה של React מתוך האינדקס
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+// וודא שב-app.js הפונקציה הראשית נקראת App
+root.render(<App />);
+</script>
+</body>
+</html>
