@@ -10,29 +10,28 @@
 <div id="emergencyBanner"></div>
 
 <div id="loginScreen">
-  <h2>כניסה למערכת</h2>
+  <h2>כניסה</h2>
   <input id="loginUser" placeholder="שם משתמש">
   <input id="loginPass" type="password" placeholder="סיסמה">
   <button onclick="login()">כניסה</button>
 </div>
 
-<div id="mainApp" class="hidden">
+<div id="app" class="hidden">
 
-  <h1>מערכת שליטה</h1>
-
+  <h1>שליטה ארגונית</h1>
   <div id="profile"></div>
 
   <div class="menu">
-    <button onclick="showSection('war')">חדר מלחמה</button>
-    <button onclick="showSection('bank')">בנק</button>
-    <button onclick="showSection('laws')">חוקים</button>
-    <button onclick="showSection('actions')">פעולות</button>
-    <button onclick="sendEmergency()">🚨 חירום</button>
+    <button onclick="show('war')">חדר מלחמה</button>
+    <button onclick="show('bank')">בנק</button>
+    <button onclick="show('laws')">חוקים</button>
+    <button onclick="show('actions')">פעולות</button>
+    <button onclick="sendEmergency()">🚨</button>
   </div>
 
   <div id="adminPanel" class="hidden">
     <h3>ניהול משתמשים</h3>
-    <input id="newName" placeholder="שם">
+    <input id="newUser" placeholder="שם">
     <input id="newPass" placeholder="סיסמה">
     <select id="newRole">
       <option>סוכן</option>
