@@ -1,0 +1,15 @@
+:root { --green: #00ff41; --bg: #050505; --border: #1a1a1a; --red: #ff0000; --gold: #d4af37; }
+body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--green); }
+.nexus-card { background: rgba(10,10,10,0.9); border: 1px solid var(--border); box-shadow: 0 0 15px rgba(0,255,65,0.05); transition: 0.3s; position: relative; overflow: hidden; }
+.nexus-card:hover { border-color: var(--green); box-shadow: 0 0 25px rgba(0,255,65,0.2); }
+.scanner-line { width: 100%; height: 1px; background: var(--green); opacity: 0.2; position: absolute; top: 0; animation: scan 4s linear infinite; }
+@keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+.glitch { text-shadow: 2px 0 var(--red), -2px 0 #00f; animation: glitch 2s infinite linear alternate-reverse; }
+@keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px,2px); } 100% { transform: translate(0); } }
+.emergency-active { animation: alarm 0.4s infinite; }
+@keyframes alarm { 0% { background: rgba(255,0,0,0.1); } 50% { background: rgba(255,0,0,0.3); } 100% { background: rgba(255,0,0,0.1); } }
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--green); }
+button:active { transform: scale(0.95); }
+input::placeholder { color: #1a5c24; }
