@@ -12,7 +12,8 @@ let db = JSON.parse(localStorage.getItem("orgDB")) || {
     }
   },
   laws: [],
-  actions: []
+  actions: [],
+  chat: []
 };
 
 let currentUser = null;
@@ -24,89 +25,88 @@ function login() {
 
   if (db.users[u] && db.users[u].password === p) {
     currentUser = u;
-    initApp();
-  } else {
-    alert("שגיאה");
-  }
+    init();
+  } else alert("שגיאה");
 }
 
 // ===== INIT =====
-function initApp() {
+function init() {
   loginScreen.classList.add("hidden");
-  mainApp.classList.remove("hidden");
+  app.classList.remove("hidden");
 
-  if (getUser().role === "admin") {
+  if (user().role === "admin") {
     adminPanel.classList.remove("hidden");
   }
 
-  renderProfile();
-  startAI();
+  renderAll();
 }
 
 // ===== USER =====
-function getUser() {
+function user() {
   return db.users[currentUser];
 }
 
+// ===== PROFILE =====
 function renderProfile() {
-  let u = getUser();
+  let u = user();
 
   profile.innerHTML = `
-    ${currentUser} | דרגה: ${u.role} | רמה: ${u.level} | XP: ${u.xp} | NUX: ${u.nux}
+  ${currentUser} | דרגה: ${u.role} | רמה: ${u.level} | XP: ${u.xp} | NUX: ${u.nux}
   `;
 }
 
 // ===== USER CREATION =====
 function createUser() {
-  db.users[newName.value] = {
+  db.users[newUser.value] = {
     password: newPass.value,
     role: newRole.value,
     xp: 0,
     level: 1,
-    nux: 100
+    nux: 100,
+    loans: [],
+    investments: []
   };
 
   save();
-  alert("נוצר");
 }
 
-// ===== AI MISSIONS =====
-function startAI() {
-  setInterval(() => {
-    generateMission();
-  }, 15000);
-}
+// ===== LEVEL SYSTEM =====
+function addXP(amount) {
+  let u = user();
+  u.xp += amount;
+  u.nux += Math.floor(amount / 2);
 
-function generateMission() {
-  let reward = Math.floor(Math.random() * 100);
-
-  let mission = document.createElement("div");
-  mission.innerHTML = `
-    משימה: מבצע סודי
-    תגמול: ${reward}
-    <button onclick="completeMission(${reward})">בצע</button>
-  `;
-
-  document.body.appendChild(mission);
-}
-
-function completeMission(r) {
-  let u = getUser();
-
-  u.xp += r;
-  u.nux += r;
-
-  if (u.xp > u.level * 200) {
+  while (u.xp >= u.level * 200) {
+    u.xp -= u.level * 200;
     u.level++;
   }
 
+  updateRole(u);
   save();
-  renderProfile();
 }
+
+function updateRole(u) {
+  if (u.level >= 10) u.role = "גנרל";
+  else if (u.level >= 6) u.role = "מפקד";
+  else if (u.level >= 3) u.role = "רכז";
+}
+
+// ===== MISSIONS =====
+setInterval(() => {
+  let reward = Math.floor(Math.random() * 80) + 20;
+
+  let div = document.createElement("div");
+  div.innerHTML = `
+    משימה: פעולה מבצעית
+    <button onclick="addXP(${reward})">בצע (+${reward})</button>
+  `;
+
+  document.body.appendChild(div);
+}, 20000);
 
 // ===== BANK =====
 function renderBank() {
-  let u = getUser();
+  let u = user();
 
   bank.innerHTML = `
     יתרה: ${u.nux}<br>
@@ -116,67 +116,126 @@ function renderBank() {
 }
 
 function loan() {
-  let u = getUser();
-  let amount = 200;
+  let u = user();
+  let amount = 300;
+  let interest = 1.2;
+
+  u.loans.push({ amount, due: Date.now() + 60000, interest });
 
   setTimeout(() => {
     u.nux += amount;
     save();
-    renderProfile();
+    renderAll();
   }, 60000);
 }
 
 function invest() {
-  let u = getUser();
+  let u = user();
 
-  let outcome = Math.random();
+  let risk = Math.random();
 
   setTimeout(() => {
-    if (outcome > 0.5) {
-      u.nux += 300;
-    } else {
-      u.nux -= 150;
-    }
+    if (risk > 0.6) u.nux += 400;
+    else if (risk > 0.3) u.nux += 100;
+    else u.nux -= 200;
+
     save();
-    renderProfile();
+    renderAll();
   }, 15000);
 }
 
 // ===== LAWS =====
-function createLaw() {
-  let text = prompt("חוק חדש:");
+function renderLaws() {
+  laws.innerHTML = "<h3>ספר חוקים</h3>";
 
-  db.laws.push({
-    text,
-    by: currentUser
+  db.laws.forEach(l => {
+    laws.innerHTML += `<p>${l.text} (ע"י ${l.by})</p>`;
   });
 
+  if (["מפקד","גנרל","admin"].includes(user().role)) {
+    laws.innerHTML += `<button onclick="createLaw()">חקיקה</button>`;
+  }
+}
+
+function createLaw() {
+  let t = prompt("חוק:");
+  db.laws.push({ text: t, by: currentUser });
   save();
+  renderLaws();
 }
 
 // ===== ACTIONS =====
-function createAction() {
-  let type = prompt("התקפה/הגנה");
+function renderActions() {
+  actions.innerHTML = "<h3>פעולות</h3>";
 
-  db.actions.push({
-    type,
-    creator: currentUser,
-    members: []
+  db.actions.forEach((a, i) => {
+    actions.innerHTML += `
+      <div>
+        ${a.type} | משתתפים: ${a.members.length}
+        <button onclick="joinAction(${i})">הצטרף</button>
+      </div>
+    `;
   });
 
+  if (["מפקד","גנרל","admin"].includes(user().role)) {
+    actions.innerHTML += `<button onclick="createAction()">פעולה חדשה</button>`;
+  }
+}
+
+function createAction() {
+  let t = prompt("התקפה / הגנה");
+  db.actions.push({ type: t, members: [] });
   save();
+  renderActions();
+}
+
+function joinAction(i) {
+  db.actions[i].members.push(currentUser);
+  save();
+  renderActions();
+}
+
+// ===== CHAT =====
+function renderWar() {
+  war.innerHTML = `
+    <div class="chatBox">
+      ${db.chat.map(m => `<p>${m}</p>`).join("")}
+    </div>
+    <input id="msg">
+    <button onclick="sendMsg()">שלח</button>
+  `;
+}
+
+function sendMsg() {
+  db.chat.push(`${currentUser}: ${msg.value}`);
+  save();
+  renderWar();
 }
 
 // ===== EMERGENCY =====
 function sendEmergency() {
   let msg = prompt("הודעה");
-
   emergencyBanner.innerText = msg;
   emergencyBanner.style.display = "block";
 
   setTimeout(() => {
     emergencyBanner.style.display = "none";
   }, 5000);
+}
+
+// ===== UI =====
+function show(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+
+  if (id === "bank") renderBank();
+  if (id === "laws") renderLaws();
+  if (id === "actions") renderActions();
+  if (id === "war") renderWar();
+}
+
+function renderAll() {
+  renderProfile();
 }
 
 // ===== SAVE =====
