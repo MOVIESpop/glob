@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+--nexus-green: #00ff41;
+--nexus-bg: #050505;
+--nexus-border: #1a1a1a;
+--nexus-red: #ff0000;
+--nexus-gold: #d4af37;
+}
+
+body {
+background-color: var(--nexus-bg);
+color: var(--nexus-green);
+font-family: 'Courier New', Courier, monospace;
+margin: 0;
+overflow-x: hidden;
+}
+
+/* אפקט כרטיס צללים */
+.shadow-card {
+background: rgba(10, 10, 10, 0.95);
+border: 1px solid var(--nexus-border);
+box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+position: relative;
+overflow: hidden;
+}
+
+.shadow-card:hover {
+border-color: var(--nexus-green);
+box-shadow: 0 0 30px rgba(0, 255, 65, 0.15);
+}
+
+/* אנימציית חירום - כל המסך מהבהב באדום */
+.emergency-active {
+animation: emergency-blink 0.4s infinite;
+}
+
+@keyframes emergency-blink {
+0% { background: rgba(255, 0, 0, 0.1); }
+50% { background: rgba(255, 0, 0, 0.3); }
+100% { background: rgba(255, 0, 0, 0.1); }
+}
+
+/* טקסט תקול (Glitch) */
+.glitch {
+text-shadow: 2px 0 var(--nexus-red), -2px 0 #0000ff;
+animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+0% { transform: translate(0); }
+20% { transform: translate(-2px, 2px); }
+40% { transform: translate(-2px, -2px); }
+60% { transform: translate(2px, 2px); }
+80% { transform: translate(2px, -2px); }
+100% { transform: translate(0); }
+}
+
+/* סורק נתונים רץ ברקע */
+.scanner-line {
+width: 100%;
+height: 2px;
+background: var(--nexus-green);
+opacity: 0.3;
+position: absolute;
+top: 0;
+animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+0% { top: 0%; }
+100% { top: 100%; }
+}
+
+/* טיימרים */
+.timer-bar {
+height: 4px;
+background: var(--nexus-gold);
+transition: width 1s linear;
+}
