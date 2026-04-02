@@ -1,63 +1,55 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TERMINAL // THE NEXUS // SOVEREIGN CORE</title>
-<script src="https://tailwindcss.com"></script>
-<script src="https://unpkg.com"></script>
+<title>מערכת הארגון</title>
 <link rel="stylesheet" href="style.css">
-<style>
-#matrix-canvas { position: fixed; top: 0; left: 0; z-index: 0; opacity: 0.15; pointer-events: none; }
-#root { position: relative; z-index: 10; }
-.boot-screen { position: fixed; inset: 0; background: black; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: monospace; color: #00ff41; }
-</style>
 </head>
-<body class="bg-black overflow-hidden m-0 p-0">
-<div id="boot-loader" class="boot-screen">
-<div id="boot-text" class="text-[10px] uppercase tracking-widest mb-4"></div>
-<div class="w-48 h-1 bg-green-900 overflow-hidden"><div id="boot-bar" class="h-full bg-green-500 w-0 transition-all duration-300"></div></div>
+<body>
+
+<div id="emergencyBanner"></div>
+
+<div id="loginScreen">
+  <h2>כניסה למערכת</h2>
+  <input id="loginUser" placeholder="שם משתמש">
+  <input id="loginPass" type="password" placeholder="סיסמה">
+  <button onclick="login()">כניסה</button>
 </div>
-<canvas id="matrix-canvas"></canvas>
-<div id="root"></div>
 
-<script src="https://unpkg.com"></script>
-<script src="https://unpkg.com"></script>
-<script src="https://unpkg.com"></script>
+<div id="mainApp" class="hidden">
 
-<script>
-const canvas = document.getElementById('matrix-canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@&*";
-const fontSize = 14; const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(1);
-function draw() {
-ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
-for (let i = 0; i < drops.length; i++) {
-const text = letters.charAt(Math.floor(Math.random() * letters.length));
-ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-drops[i]++;
-}
-}
-setInterval(draw, 33);
+  <h1>מערכת שליטה</h1>
 
-const logs = ["> INJECTING CORE...", "> BYPASSING FIREWALL...", "> LINKING NEURAL_NET...", "> ACCESS GRANTED."];
-let lIdx = 0;
-function boot() {
-if (lIdx < logs.length) {
-document.getElementById('boot-text').innerText = logs[lIdx];
-document.getElementById('boot-bar').style.width = (lIdx + 1) * 25 + "%";
-lIdx++; setTimeout(boot, 600);
-} else {
-setTimeout(() => document.getElementById('boot-loader').style.display = 'none', 500);
-}
-}
-boot();
-lucide.createIcons();
-</script>
-<script type="text/babel" src="script.js"></script>
+  <div id="profile"></div>
+
+  <div class="menu">
+    <button onclick="showSection('war')">חדר מלחמה</button>
+    <button onclick="showSection('bank')">בנק</button>
+    <button onclick="showSection('laws')">חוקים</button>
+    <button onclick="showSection('actions')">פעולות</button>
+    <button onclick="sendEmergency()">🚨 חירום</button>
+  </div>
+
+  <div id="adminPanel" class="hidden">
+    <h3>ניהול משתמשים</h3>
+    <input id="newName" placeholder="שם">
+    <input id="newPass" placeholder="סיסמה">
+    <select id="newRole">
+      <option>סוכן</option>
+      <option>רכז</option>
+      <option>מפקד</option>
+      <option>גנרל</option>
+    </select>
+    <button onclick="createUser()">צור</button>
+  </div>
+
+  <div id="war" class="section"></div>
+  <div id="bank" class="section hidden"></div>
+  <div id="laws" class="section hidden"></div>
+  <div id="actions" class="section hidden"></div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
